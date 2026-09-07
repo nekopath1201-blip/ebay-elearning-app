@@ -1,0 +1,88 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  STUDENT
+}
+
+enum TaskType {
+  VIDEO
+  TEXT
+  FILE
+  QUIZ
+}
+
+enum ProgressStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+model User {
+  id           String     @id @default(cuid())
+  email        String     @unique
+  passwordHash String
+  name         String
+  role         Role       @default(STUDENT)
+  createdAt    DateTime   @default(now())
+  progress     Progress[]
+}
+
+model Section {
+  id          String   @id @default(cuid())
+  title       String
+  description String?
+  order       Int
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  tasks       Task[]
+}
+
+model Task {
+  id        String         @id @default(cuid())
+  section   Section        @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  sectionId String
+  title     String
+  type      TaskType
+  order     Int
+  videoUrl  String?
+  textBody  String?
+  fileUrl   String?
+  fileName  String?
+  imageUrls String[]       @default([])
+  published Boolean        @default(true)
+  createdAt DateTime       @default(now())
+  questions QuizQuestion[]
+  progress  Progress[]
+}
+
+model QuizQuestion {
+  id                 String @id @default(cuid())
+  task               Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId             String
+  question           String
+  choices            Json
+  correctAnswerIndex Int
+  order              Int
+}
+
+model Progress {
+  id          String         @id @default(cuid())
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      String
+  task        Task           @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId      String
+  status      ProgressStatus @default(NOT_STARTED)
+  quizScore   Int?
+  completedAt DateTime?
+  updatedAt   DateTime       @updatedAt
+
+  @@unique([userId, taskId])
+}
