@@ -55,14 +55,14 @@ export function QuizForm({
       <button
         type="submit"
         disabled={isPending}
-        className="self-start rounded-md bg-orange-500 px-5 py-2 text-sm font-semibold text-white hover:bg-orange-600 disabled:opacity-50"
+        className="self-start rounded-md bg-brown-500 px-5 py-2 text-sm font-semibold text-white hover:bg-brown-600 disabled:opacity-50"
       >
         {isPending ? "採点中..." : "回答する"}
       </button>
 
       {state && (
-        <p className="rounded-md bg-orange-50 p-3 text-sm text-gray-800">
-          🐱 {state.catMessage}
+        <p className="rounded-md bg-brown-50 p-3 text-sm text-gray-800">
+          {state.catMessage}
           <br />
           {state.correctCount} / {state.total} 問正解しました。
           {state.allCorrect ? " この課題は完了です！" : " もう一度挑戦してみましょう。"}

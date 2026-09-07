@@ -58,7 +58,7 @@ export default async function AdminTaskDetailPage({
           )}
           <button
             type="submit"
-            className="self-start rounded-md bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600"
+            className="self-start rounded-md bg-brown-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brown-600"
           >
             更新
           </button>
@@ -81,7 +81,7 @@ export default async function AdminTaskDetailPage({
           {task.fileUrl && (
             <p className="mb-4 text-sm">
               現在のファイル:{" "}
-              <a href={task.fileUrl} className="text-orange-600 hover:text-orange-700 hover:underline">
+              <a href={task.fileUrl} className="text-brown-600 hover:text-brown-700 hover:underline">
                 {task.fileName}
               </a>
             </p>
@@ -155,7 +155,7 @@ export default async function AdminTaskDetailPage({
               </label>
               <button
                 type="submit"
-                className="self-start rounded-md bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600"
+                className="self-start rounded-md bg-brown-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brown-600"
               >
                 追加
               </button>

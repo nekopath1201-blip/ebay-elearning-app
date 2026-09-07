@@ -66,7 +66,7 @@ export default async function AdminSectionDetailPage({
           <div className="flex gap-2">
             <button
               type="submit"
-              className="self-start rounded-md bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600"
+              className="self-start rounded-md bg-brown-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brown-600"
             >
               更新
             </button>
@@ -111,7 +111,7 @@ export default async function AdminSectionDetailPage({
           </p>
           <button
             type="submit"
-            className="self-start rounded-md bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600"
+            className="self-start rounded-md bg-brown-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brown-600"
           >
             課題を追加
           </button>
@@ -135,7 +135,7 @@ export default async function AdminSectionDetailPage({
                     type="submit"
                     disabled={index === 0}
                     aria-label="上に移動"
-                    className="text-gray-400 hover:text-orange-600 disabled:opacity-20"
+                    className="text-gray-400 hover:text-brown-600 disabled:opacity-20"
                   >
                     ▲
                   </button>
@@ -145,7 +145,7 @@ export default async function AdminSectionDetailPage({
                     type="submit"
                     disabled={index === section.tasks.length - 1}
                     aria-label="下に移動"
-                    className="text-gray-400 hover:text-orange-600 disabled:opacity-20"
+                    className="text-gray-400 hover:text-brown-600 disabled:opacity-20"
                   >
                     ▼
                   </button>
@@ -162,7 +162,7 @@ export default async function AdminSectionDetailPage({
             <div className="flex items-center gap-3">
               <Link
                 href={`/admin/sections/${section.id}/tasks/${task.id}`}
-                className="text-sm text-orange-600 hover:text-orange-700 hover:underline"
+                className="text-sm text-brown-600 hover:text-brown-700 hover:underline"
               >
                 編集
               </Link>

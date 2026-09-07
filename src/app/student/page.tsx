@@ -57,7 +57,7 @@ export default async function StudentHomePage() {
                 {completedCount} / {section.tasks.length} 課題完了
               </p>
             </div>
-            <span className="text-sm text-orange-600">→</span>
+            <span className="text-sm text-brown-600">→</span>
           </Link>
         );
       })}

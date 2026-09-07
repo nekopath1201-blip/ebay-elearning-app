@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "eBay研修 Eラーニング",
-  description: "猫のにゃん助と一緒に学ぶeBay研修Eラーニングシステム",
+  description: "チビ太と一緒に学ぶeBay研修Eラーニングシステム",
 };
 
 export default function RootLayout({

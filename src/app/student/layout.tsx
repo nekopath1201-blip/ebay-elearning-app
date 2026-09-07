@@ -16,12 +16,12 @@ export default async function StudentLayout({
   const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
 
   return (
-    <div className="min-h-screen bg-orange-50">
+    <div className="min-h-screen bg-brown-50">
       <header className="border-b bg-white">
         <div className="mx-auto max-w-3xl px-4 py-3">
           <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
-            <Link href="/student" className="font-bold whitespace-nowrap text-gray-800 hover:text-orange-600">
-              🐱 ネコパスのイーラーニング
+            <Link href="/student" className="font-bold whitespace-nowrap text-gray-800 hover:text-brown-600">
+              eBay研修 イーラーニング
             </Link>
             <form action={logoutAction}>
               <button type="submit" className="text-sm whitespace-nowrap text-gray-500 hover:text-gray-800">
@@ -30,10 +30,10 @@ export default async function StudentLayout({
             </form>
           </div>
           <nav className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-            <Link href="/student" className="whitespace-nowrap text-gray-600 hover:text-orange-600">
+            <Link href="/student" className="whitespace-nowrap text-gray-600 hover:text-brown-600">
               ホーム
             </Link>
-            <Link href="/student/password" className="whitespace-nowrap text-gray-600 hover:text-orange-600">
+            <Link href="/student/password" className="whitespace-nowrap text-gray-600 hover:text-brown-600">
               パスワード変更
             </Link>
           </nav>
@@ -47,7 +47,7 @@ export default async function StudentLayout({
           </div>
           <div className="mt-1 h-2 w-full rounded-full bg-gray-200">
             <div
-              className="h-2 rounded-full bg-orange-500 transition-all"
+              className="h-2 rounded-full bg-brown-500 transition-all"
               style={{ width: `${percent}%` }}
             />
           </div>

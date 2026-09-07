@@ -11,6 +11,13 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  --color-brown-50: #f7f1ea;
+  --color-brown-100: #ede0d1;
+  --color-brown-200: #d9c0a0;
+  --color-brown-500: #8b5e3c;
+  --color-brown-600: #6f4a2e;
+  --color-brown-700: #593a25;
 }
 
 body {

@@ -36,7 +36,7 @@ export default async function AdminSectionsPage() {
           />
           <button
             type="submit"
-            className="self-start rounded-md bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600"
+            className="self-start rounded-md bg-brown-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brown-600"
           >
             作成
           </button>
@@ -59,7 +59,7 @@ export default async function AdminSectionsPage() {
                     type="submit"
                     disabled={index === 0}
                     aria-label="上に移動"
-                    className="text-gray-400 hover:text-orange-600 disabled:opacity-20"
+                    className="text-gray-400 hover:text-brown-600 disabled:opacity-20"
                   >
                     ▲
                   </button>
@@ -69,7 +69,7 @@ export default async function AdminSectionsPage() {
                     type="submit"
                     disabled={index === sections.length - 1}
                     aria-label="下に移動"
-                    className="text-gray-400 hover:text-orange-600 disabled:opacity-20"
+                    className="text-gray-400 hover:text-brown-600 disabled:opacity-20"
                   >
                     ▼
                   </button>
@@ -85,7 +85,7 @@ export default async function AdminSectionsPage() {
             </div>
             <Link
               href={`/admin/sections/${section.id}`}
-              className="text-sm text-orange-600 hover:text-orange-700 hover:underline"
+              className="text-sm text-brown-600 hover:text-brown-700 hover:underline"
             >
               編集 →
             </Link>

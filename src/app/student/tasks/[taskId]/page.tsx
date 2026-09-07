@@ -94,7 +94,7 @@ export default async function StudentTaskDetailPage({
         {task.type === "FILE" && task.fileUrl && (
           <a
             href={task.fileUrl}
-            className="mt-4 inline-block rounded-md bg-orange-100 px-4 py-2 text-sm text-orange-700 hover:bg-orange-200"
+            className="mt-4 inline-block rounded-md bg-brown-100 px-4 py-2 text-sm text-brown-700 hover:bg-brown-200"
           >
             📄 {task.fileName ?? "ファイルをダウンロード"}
           </a>
@@ -137,7 +137,7 @@ export default async function StudentTaskDetailPage({
               <form action={markCompleteWithTaskId}>
                 <button
                   type="submit"
-                  className="rounded-md bg-orange-500 px-5 py-2 text-sm font-semibold text-white hover:bg-orange-600"
+                  className="rounded-md bg-brown-500 px-5 py-2 text-sm font-semibold text-white hover:bg-brown-600"
                 >
                   完了にする
                 </button>

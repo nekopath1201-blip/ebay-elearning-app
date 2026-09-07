@@ -33,7 +33,7 @@ export function CreateStudentForm() {
       <button
         type="submit"
         disabled={isPending}
-        className="self-start rounded-md bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600 disabled:opacity-50"
+        className="self-start rounded-md bg-brown-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brown-600 disabled:opacity-50"
       >
         {isPending ? "発行中..." : "アカウントを発行"}
       </button>
