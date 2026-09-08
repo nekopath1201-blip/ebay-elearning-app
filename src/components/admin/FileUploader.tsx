@@ -13,6 +13,7 @@ export function FileUploader({
   accept: string;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [fileName, setFileName] = useState<string | null>(null);
   const [status, setStatus] = useState<
     { state: "idle" } | { state: "uploading" } | { state: "error"; message: string } | { state: "done" }
   >({ state: "idle" });
@@ -20,6 +21,7 @@ export function FileUploader({
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    setFileName(file.name);
 
     setStatus({ state: "uploading" });
     try {
@@ -65,14 +67,27 @@ export function FileUploader({
 
   return (
     <div className="flex flex-col gap-1">
-      <input
-        ref={inputRef}
-        type="file"
-        accept={accept}
-        onChange={handleFileChange}
-        disabled={status.state === "uploading"}
-        className="text-sm"
-      />
+      <div className="flex items-center gap-2">
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          disabled={status.state === "uploading"}
+          className="rounded-md border border-gray-300 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+        >
+          ファイルを選択
+        </button>
+        <span className="text-sm text-gray-500">
+          {fileName ?? "ファイルがありません"}
+        </span>
+        <input
+          ref={inputRef}
+          type="file"
+          accept={accept}
+          onChange={handleFileChange}
+          disabled={status.state === "uploading"}
+          className="hidden"
+        />
+      </div>
       {status.state === "uploading" && (
         <p className="text-xs text-gray-500">アップロード中...</p>
       )}

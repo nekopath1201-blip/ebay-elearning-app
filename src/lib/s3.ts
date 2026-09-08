@@ -7,12 +7,13 @@ function getS3Config() {
   const accessKeyId = process.env.S3_ACCESS_KEY_ID;
   const secretAccessKey = process.env.S3_SECRET_ACCESS_KEY;
   const endpoint = process.env.S3_ENDPOINT || undefined;
+  const publicUrlBase = process.env.S3_PUBLIC_URL || undefined;
 
   if (!region || !bucket || !accessKeyId || !secretAccessKey) {
     return null;
   }
 
-  return { region, bucket, accessKeyId, secretAccessKey, endpoint };
+  return { region, bucket, accessKeyId, secretAccessKey, endpoint, publicUrlBase };
 }
 
 export function isS3Configured() {
@@ -47,9 +48,11 @@ export async function createUploadUrl(key: string, contentType: string) {
   });
 
   const uploadUrl = await getSignedUrl(client, command, { expiresIn: 300 });
-  const publicUrl = config.endpoint
-    ? `${config.endpoint.replace(/\/$/, "")}/${config.bucket}/${key}`
-    : `https://${config.bucket}.s3.${config.region}.amazonaws.com/${key}`;
+  const publicUrl = config.publicUrlBase
+    ? `${config.publicUrlBase.replace(/\/$/, "")}/${key}`
+    : config.endpoint
+      ? `${config.endpoint.replace(/\/$/, "")}/${config.bucket}/${key}`
+      : `https://${config.bucket}.s3.${config.region}.amazonaws.com/${key}`;
 
   return { uploadUrl, publicUrl };
 }
