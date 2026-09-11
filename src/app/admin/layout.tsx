@@ -27,6 +27,9 @@ export default function AdminLayout({
             <Link href="/admin/students" className="whitespace-nowrap text-gray-600 hover:text-brown-600">
               受講者管理
             </Link>
+            <Link href="/admin/email" className="whitespace-nowrap text-gray-600 hover:text-brown-600">
+              メールアドレス変更
+            </Link>
             <Link href="/admin/password" className="whitespace-nowrap text-gray-600 hover:text-brown-600">
               パスワード変更
             </Link>
