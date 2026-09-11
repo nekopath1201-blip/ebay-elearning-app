@@ -13,7 +13,7 @@ export default async function LoginPage() {
       <div className="w-full max-w-sm rounded-2xl bg-white p-8 shadow-md">
         <div className="mb-6 text-center">
           <h1 className="text-xl font-bold text-gray-800">
-            Eラーニングにログイン
+            ebay チビ太クラス
           </h1>
           <p className="mt-1 text-sm text-gray-500">
             管理者から発行されたアカウントでログインしてください
