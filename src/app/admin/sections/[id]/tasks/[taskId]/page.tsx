@@ -3,6 +3,8 @@ import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import {
   updateTaskText,
+  removeTaskVideo,
+  removeTaskFile,
   removeTaskImage,
 } from "@/app/actions/admin-tasks";
 import { FileUploader } from "@/components/admin/FileUploader";
@@ -62,7 +64,17 @@ export default async function AdminTaskDetailPage({
       <div className="rounded-xl bg-white p-6 shadow-sm">
         <h2 className="mb-4 text-sm font-semibold text-gray-700">動画</h2>
         {task.videoUrl && (
-          <video src={task.videoUrl} controls className="mb-4 w-full max-w-md rounded-md" />
+          <div className="mb-4">
+            <video src={task.videoUrl} controls className="w-full max-w-md rounded-md" />
+            <form action={removeTaskVideo.bind(null, task.id)} className="mt-1">
+              <ConfirmSubmitButton
+                confirmMessage="この動画を削除しますか？"
+                className="text-xs text-red-600 hover:text-red-700 hover:underline"
+              >
+                削除
+              </ConfirmSubmitButton>
+            </form>
+          </div>
         )}
         <FileUploader taskId={task.id} kind="video" accept="video/*" />
       </div>
@@ -70,12 +82,22 @@ export default async function AdminTaskDetailPage({
       <div className="rounded-xl bg-white p-6 shadow-sm">
         <h2 className="mb-4 text-sm font-semibold text-gray-700">ファイル</h2>
         {task.fileUrl && (
-          <p className="mb-4 text-sm">
-            現在のファイル:{" "}
-            <a href={task.fileUrl} className="text-brown-600 hover:text-brown-700 hover:underline">
-              {task.fileName}
-            </a>
-          </p>
+          <div className="mb-4 flex items-center gap-3 text-sm">
+            <span>
+              現在のファイル:{" "}
+              <a href={task.fileUrl} className="text-brown-600 hover:text-brown-700 hover:underline">
+                {task.fileName}
+              </a>
+            </span>
+            <form action={removeTaskFile.bind(null, task.id)}>
+              <ConfirmSubmitButton
+                confirmMessage="このファイルを削除しますか？"
+                className="text-xs text-red-600 hover:text-red-700 hover:underline"
+              >
+                削除
+              </ConfirmSubmitButton>
+            </form>
+          </div>
         )}
         <FileUploader taskId={task.id} kind="file" accept="*/*" />
       </div>

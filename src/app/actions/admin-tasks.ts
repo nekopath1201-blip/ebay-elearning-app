@@ -77,6 +77,32 @@ export async function attachUploadedFile(
   revalidatePath("/student", "layout");
 }
 
+export async function removeTaskVideo(taskId: string) {
+  await requireAdmin();
+
+  const task = await prisma.task.update({
+    where: { id: taskId },
+    data: { videoUrl: null },
+  });
+
+  revalidatePath(`/admin/sections/${task.sectionId}`);
+  revalidatePath(`/admin/sections/${task.sectionId}/tasks/${taskId}`);
+  revalidatePath("/student", "layout");
+}
+
+export async function removeTaskFile(taskId: string) {
+  await requireAdmin();
+
+  const task = await prisma.task.update({
+    where: { id: taskId },
+    data: { fileUrl: null, fileName: null },
+  });
+
+  revalidatePath(`/admin/sections/${task.sectionId}`);
+  revalidatePath(`/admin/sections/${task.sectionId}/tasks/${taskId}`);
+  revalidatePath("/student", "layout");
+}
+
 export async function removeTaskImage(taskId: string, url: string) {
   await requireAdmin();
 
