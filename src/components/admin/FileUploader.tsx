@@ -77,7 +77,7 @@ export function FileUploader({
           ファイルを選択
         </button>
         <span className="text-sm text-gray-500">
-          {fileName ?? "ファイルがありません"}
+          {fileName ?? "新しいファイルは選択されていません"}
         </span>
         <input
           ref={inputRef}

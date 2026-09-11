@@ -9,7 +9,6 @@ import {
   getUserCompletedTaskCount,
 } from "@/lib/progress";
 import { CatMascot } from "@/components/CatMascot";
-import { QuizForm } from "@/components/student/QuizForm";
 
 export default async function StudentTaskDetailPage({
   params,
@@ -22,7 +21,7 @@ export default async function StudentTaskDetailPage({
 
   const task = await prisma.task.findUnique({
     where: { id: taskId },
-    include: { section: true, questions: { orderBy: { order: "asc" } } },
+    include: { section: true },
   });
 
   if (!task || !task.published || !task.section.published) notFound();
@@ -81,17 +80,17 @@ export default async function StudentTaskDetailPage({
         <p className="text-xs text-gray-400">{task.section.title}</p>
         <h1 className="mt-1 text-lg font-bold text-gray-800">{task.title}</h1>
 
-        {(task.type === "TEXT" || task.type === "VIDEO") && task.textBody && (
+        {task.textBody && (
           <p className="mt-4 whitespace-pre-wrap text-sm text-gray-700">
             {task.textBody}
           </p>
         )}
 
-        {task.type === "VIDEO" && task.videoUrl && (
+        {task.videoUrl && (
           <video src={task.videoUrl} controls className="mt-4 w-full rounded-md" />
         )}
 
-        {task.type === "FILE" && task.fileUrl && (
+        {task.fileUrl && (
           <a
             href={task.fileUrl}
             className="mt-4 inline-block rounded-md bg-brown-100 px-4 py-2 text-sm text-brown-700 hover:bg-brown-200"
@@ -114,37 +113,22 @@ export default async function StudentTaskDetailPage({
           </div>
         )}
 
-        {task.type === "QUIZ" && (
-          <div className="mt-4">
-            <QuizForm
-              taskId={task.id}
-              questions={task.questions.map((q) => ({
-                id: q.id,
-                question: q.question,
-                choices: q.choices as string[],
-              }))}
-            />
-          </div>
-        )}
-
-        {task.type !== "QUIZ" && (
-          <div className="mt-6">
-            {isCompleted ? (
-              <span className="rounded-md bg-green-50 px-4 py-2 text-sm text-green-700">
-                ✅ この課題は完了しています
-              </span>
-            ) : (
-              <form action={markCompleteWithTaskId}>
-                <button
-                  type="submit"
-                  className="rounded-md bg-brown-500 px-5 py-2 text-sm font-semibold text-white hover:bg-brown-600"
-                >
-                  完了にする
-                </button>
-              </form>
-            )}
-          </div>
-        )}
+        <div className="mt-6">
+          {isCompleted ? (
+            <span className="rounded-md bg-green-50 px-4 py-2 text-sm text-green-700">
+              ✅ この課題は完了しています
+            </span>
+          ) : (
+            <form action={markCompleteWithTaskId}>
+              <button
+                type="submit"
+                className="rounded-md bg-brown-500 px-5 py-2 text-sm font-semibold text-white hover:bg-brown-600"
+              >
+                完了にする
+              </button>
+            </form>
+          )}
+        </div>
       </div>
 
       <CatMascot message={catMessage} />

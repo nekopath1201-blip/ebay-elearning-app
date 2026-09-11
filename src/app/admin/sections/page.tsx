@@ -50,9 +50,14 @@ export default async function AdminSectionsPage() {
         {sections.map((section, index) => (
           <div
             key={section.id}
-            className="flex items-center justify-between rounded-xl bg-white p-4 shadow-sm"
+            className="relative flex items-center justify-between rounded-xl bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
           >
-            <div className="flex items-center gap-3">
+            <Link
+              href={`/admin/sections/${section.id}`}
+              className="absolute inset-0 z-0"
+              aria-label={`${section.title}を編集`}
+            />
+            <div className="relative z-10 flex items-center gap-3">
               <div className="flex flex-col">
                 <form action={moveSection.bind(null, section.id, "up")}>
                   <button
@@ -83,12 +88,9 @@ export default async function AdminSectionsPage() {
                 </p>
               </div>
             </div>
-            <Link
-              href={`/admin/sections/${section.id}`}
-              className="text-sm text-brown-600 hover:text-brown-700 hover:underline"
-            >
+            <span className="relative z-10 text-sm text-brown-600">
               編集 →
-            </Link>
+            </span>
           </div>
         ))}
       </div>

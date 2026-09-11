@@ -12,13 +12,6 @@ enum Role {
   STUDENT
 }
 
-enum TaskType {
-  VIDEO
-  TEXT
-  FILE
-  QUIZ
-}
-
 enum ProgressStatus {
   NOT_STARTED
   IN_PROGRESS
@@ -46,31 +39,19 @@ model Section {
 }
 
 model Task {
-  id        String         @id @default(cuid())
-  section   Section        @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  id        String     @id @default(cuid())
+  section   Section    @relation(fields: [sectionId], references: [id], onDelete: Cascade)
   sectionId String
   title     String
-  type      TaskType
   order     Int
   videoUrl  String?
   textBody  String?
   fileUrl   String?
   fileName  String?
-  imageUrls String[]       @default([])
-  published Boolean        @default(true)
-  createdAt DateTime       @default(now())
-  questions QuizQuestion[]
+  imageUrls String[]   @default([])
+  published Boolean    @default(true)
+  createdAt DateTime   @default(now())
   progress  Progress[]
-}
-
-model QuizQuestion {
-  id                 String @id @default(cuid())
-  task               Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
-  taskId             String
-  question           String
-  choices            Json
-  correctAnswerIndex Int
-  order              Int
 }
 
 model Progress {
@@ -80,7 +61,6 @@ model Progress {
   task        Task           @relation(fields: [taskId], references: [id], onDelete: Cascade)
   taskId      String
   status      ProgressStatus @default(NOT_STARTED)
-  quizScore   Int?
   completedAt DateTime?
   updatedAt   DateTime       @updatedAt
 

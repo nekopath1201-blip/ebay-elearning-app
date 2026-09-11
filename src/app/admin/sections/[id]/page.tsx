@@ -8,13 +8,6 @@ import {
 import { createTask, deleteTask, moveTask } from "@/app/actions/admin-tasks";
 import { ConfirmSubmitButton } from "@/components/admin/ConfirmSubmitButton";
 
-const TASK_TYPE_LABEL: Record<string, string> = {
-  VIDEO: "動画+テキスト+画像",
-  TEXT: "テキスト+画像",
-  FILE: "ファイル+画像",
-  QUIZ: "クイズ",
-};
-
 export default async function AdminSectionDetailPage({
   params,
 }: {
@@ -91,15 +84,6 @@ export default async function AdminSectionDetailPage({
             required
             className="rounded-md border border-gray-300 px-3 py-2 text-sm"
           />
-          <select
-            name="type"
-            className="rounded-md border border-gray-300 px-3 py-2 text-sm"
-          >
-            <option value="TEXT">テキスト+画像</option>
-            <option value="VIDEO">動画+テキスト+画像</option>
-            <option value="FILE">ファイル+画像</option>
-            <option value="QUIZ">クイズ</option>
-          </select>
           <textarea
             name="textBody"
             placeholder="テキスト内容（あとから編集画面でも変更できます）"
@@ -107,7 +91,7 @@ export default async function AdminSectionDetailPage({
             className="rounded-md border border-gray-300 px-3 py-2 text-sm"
           />
           <p className="text-xs text-gray-500">
-            動画・画像・ファイルの添付、クイズの設問追加は、作成後の編集画面から行えます。
+            動画・画像・ファイルの添付は、作成後の編集画面から行えます。
           </p>
           <button
             type="submit"
@@ -153,10 +137,9 @@ export default async function AdminSectionDetailPage({
               </div>
               <div>
                 <p className="font-semibold text-gray-800">{task.title}</p>
-                <p className="text-xs text-gray-500">
-                  {TASK_TYPE_LABEL[task.type]}
-                  {!task.published && "（非公開）"}
-                </p>
+                {!task.published && (
+                  <p className="text-xs text-gray-500">（非公開）</p>
+                )}
               </div>
             </div>
             <div className="flex items-center gap-3">
