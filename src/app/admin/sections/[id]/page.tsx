@@ -110,10 +110,15 @@ export default async function AdminSectionDetailPage({
         {section.tasks.map((task, index) => (
           <div
             key={task.id}
-            className="flex items-center justify-between rounded-xl bg-white p-4 shadow-sm"
+            className="relative flex items-center justify-between rounded-xl bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
           >
-            <div className="flex items-center gap-3">
-              <div className="flex flex-col">
+            <Link
+              href={`/admin/sections/${section.id}/tasks/${task.id}`}
+              className="absolute inset-0 z-0"
+              aria-label={`${task.title}を編集`}
+            />
+            <div className="pointer-events-none relative z-10 flex items-center gap-3">
+              <div className="pointer-events-auto flex flex-col">
                 <form action={moveTask.bind(null, section.id, task.id, "up")}>
                   <button
                     type="submit"
@@ -142,14 +147,11 @@ export default async function AdminSectionDetailPage({
                 )}
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <Link
-                href={`/admin/sections/${section.id}/tasks/${task.id}`}
-                className="text-sm text-brown-600 hover:text-brown-700 hover:underline"
-              >
+            <div className="pointer-events-none relative z-10 flex items-center gap-3">
+              <span className="pointer-events-none rounded-md border border-brown-600 px-3 py-1 text-sm text-brown-600">
                 編集
-              </Link>
-              <form action={deleteTask.bind(null, task.id)}>
+              </span>
+              <form action={deleteTask.bind(null, task.id)} className="pointer-events-auto">
                 <ConfirmSubmitButton
                   confirmMessage="この課題を削除します。よろしいですか？"
                   className="text-sm text-red-600 hover:text-red-700 hover:underline"
