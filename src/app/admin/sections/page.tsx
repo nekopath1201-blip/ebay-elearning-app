@@ -57,8 +57,8 @@ export default async function AdminSectionsPage() {
               className="absolute inset-0 z-0"
               aria-label={`${section.title}を編集`}
             />
-            <div className="relative z-10 flex items-center gap-3">
-              <div className="flex flex-col">
+            <div className="pointer-events-none relative z-10 flex items-center gap-3">
+              <div className="pointer-events-auto flex flex-col">
                 <form action={moveSection.bind(null, section.id, "up")}>
                   <button
                     type="submit"
@@ -88,7 +88,7 @@ export default async function AdminSectionsPage() {
                 </p>
               </div>
             </div>
-            <span className="relative z-10 text-sm text-brown-600">
+            <span className="pointer-events-none relative z-10 text-sm text-brown-600">
               編集 →
             </span>
           </div>
