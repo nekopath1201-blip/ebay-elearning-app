@@ -88,8 +88,8 @@ export default async function AdminSectionsPage() {
                 </p>
               </div>
             </div>
-            <span className="pointer-events-none relative z-10 text-sm text-brown-600">
-              編集 →
+            <span className="pointer-events-none relative z-10 rounded-md border border-brown-600 px-3 py-1 text-sm text-brown-600">
+              編集
             </span>
           </div>
         ))}
