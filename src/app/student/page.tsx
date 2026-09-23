@@ -41,6 +41,8 @@ export default async function StudentHomePage() {
         const completedCount = section.tasks.filter((t) =>
           completedTaskIds.has(t.id)
         ).length;
+        const isSectionComplete =
+          section.tasks.length > 0 && completedCount === section.tasks.length;
 
         return (
           <Link
@@ -53,7 +55,12 @@ export default async function StudentHomePage() {
               {section.description && (
                 <p className="mt-1 text-sm text-gray-500">{section.description}</p>
               )}
-              <p className="mt-2 text-xs text-gray-500">
+              <p className="mt-2 flex items-center gap-2 text-xs text-gray-500">
+                {isSectionComplete && (
+                  <span className="rounded-full bg-green-100 px-2 py-0.5 font-semibold text-green-700">
+                    完了
+                  </span>
+                )}
                 {completedCount} / {section.tasks.length} 課題完了
               </p>
             </div>
