@@ -9,6 +9,7 @@ import {
   getUserCompletedTaskCount,
 } from "@/lib/progress";
 import { CatMascot } from "@/components/CatMascot";
+import { ImageGallery } from "@/components/student/ImageGallery";
 
 export default async function StudentTaskDetailPage({
   params,
@@ -99,19 +100,7 @@ export default async function StudentTaskDetailPage({
           </a>
         )}
 
-        {task.imageUrls.length > 0 && (
-          <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {task.imageUrls.map((url) => (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                key={url}
-                src={url}
-                alt=""
-                className="w-full rounded-md border border-gray-100"
-              />
-            ))}
-          </div>
-        )}
+        <ImageGallery imageUrls={task.imageUrls} />
 
         <div className="mt-6">
           {isCompleted ? (
