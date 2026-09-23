@@ -116,10 +116,12 @@ export default async function AdminTaskDetailPage({
                   alt=""
                   className="h-32 w-full rounded-md object-cover"
                 />
+                {image.title && (
+                  <p className="text-xs text-gray-700">{image.title}</p>
+                )}
                 <form action={updateImageTitle.bind(null, image.id)} className="flex gap-1">
                   <input
                     name="title"
-                    defaultValue={image.title ?? ""}
                     placeholder="画像タイトル"
                     className="w-full rounded-md border border-gray-300 px-2 py-1 text-xs"
                   />
