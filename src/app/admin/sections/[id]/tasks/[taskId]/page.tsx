@@ -10,6 +10,7 @@ import {
 } from "@/app/actions/admin-tasks";
 import { FileUploader } from "@/components/admin/FileUploader";
 import { ConfirmSubmitButton } from "@/components/admin/ConfirmSubmitButton";
+import { RichTextEditor } from "@/components/admin/RichTextEditor";
 
 export default async function AdminTaskDetailPage({
   params,
@@ -47,12 +48,10 @@ export default async function AdminTaskDetailPage({
             required
             className="rounded-md border border-gray-300 px-3 py-2 text-sm"
           />
-          <textarea
+          <RichTextEditor
             name="textBody"
             defaultValue={task.textBody ?? ""}
-            rows={6}
             placeholder="本文"
-            className="rounded-md border border-gray-300 px-3 py-2 text-sm"
           />
           <button
             type="submit"

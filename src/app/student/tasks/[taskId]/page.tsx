@@ -82,9 +82,10 @@ export default async function StudentTaskDetailPage({
         <h1 className="mt-1 text-lg font-bold text-gray-800">{task.title}</h1>
 
         {task.textBody && (
-          <p className="mt-4 whitespace-pre-wrap text-sm text-gray-700">
-            {task.textBody}
-          </p>
+          <div
+            className="mt-4 whitespace-pre-wrap text-sm text-gray-700"
+            dangerouslySetInnerHTML={{ __html: task.textBody }}
+          />
         )}
 
         {task.videoUrl && (
