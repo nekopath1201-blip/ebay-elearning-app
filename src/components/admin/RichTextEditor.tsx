@@ -124,29 +124,28 @@ export function RichTextEditor({
         </button>
       </div>
 
-      {htmlMode ? (
-        <textarea
-          value={htmlValue}
-          onChange={(e) => {
-            setHtmlValue(e.target.value);
-            sync(e.target.value);
-          }}
-          rows={10}
-          placeholder="<p>本文</p> のようにHTMLタグを直接入力できます"
-          className="min-h-[150px] rounded-b-md border border-gray-300 px-3 py-2 font-mono text-xs focus:outline-none"
-        />
-      ) : (
-        <div
-          ref={editorRef}
-          contentEditable
-          onInput={() => sync()}
-          onPaste={handlePaste}
-          onBlur={() => sync()}
-          data-placeholder={placeholder}
-          className="min-h-[150px] rounded-b-md border border-gray-300 px-3 py-2 text-sm empty:before:text-gray-400 empty:before:content-[attr(data-placeholder)] focus:outline-none"
-          suppressContentEditableWarning
-        />
-      )}
+      <textarea
+        value={htmlValue}
+        onChange={(e) => {
+          setHtmlValue(e.target.value);
+          sync(e.target.value);
+        }}
+        rows={10}
+        placeholder="<p>本文</p> のようにHTMLタグを直接入力できます"
+        hidden={!htmlMode}
+        className="min-h-[150px] rounded-b-md border border-gray-300 px-3 py-2 font-mono text-xs focus:outline-none"
+      />
+      <div
+        ref={editorRef}
+        contentEditable
+        onInput={() => sync()}
+        onPaste={handlePaste}
+        onBlur={() => sync()}
+        data-placeholder={placeholder}
+        hidden={htmlMode}
+        className="min-h-[150px] rounded-b-md border border-gray-300 px-3 py-2 text-sm empty:before:text-gray-400 empty:before:content-[attr(data-placeholder)] focus:outline-none"
+        suppressContentEditableWarning
+      />
 
       <input
         ref={hiddenRef}
