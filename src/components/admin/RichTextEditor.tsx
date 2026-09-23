@@ -27,6 +27,7 @@ export function RichTextEditor({
   placeholder?: string;
 }) {
   const editorRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const hiddenRef = useRef<HTMLInputElement>(null);
   const [htmlMode, setHtmlMode] = useState(false);
   const [htmlValue, setHtmlValue] = useState(defaultValue || "");
@@ -37,6 +38,25 @@ export function RichTextEditor({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Safety net: whatever is currently visible (WYSIWYG or HTML source) is
+  // read directly from the DOM right as the form collects its data, so the
+  // submitted value can never drift from what the admin is actually looking at.
+  useEffect(() => {
+    const form = hiddenRef.current?.form;
+    if (!form) return;
+
+    function handleFormData(e: FormDataEvent) {
+      const isHtmlVisible = !!textareaRef.current && !textareaRef.current.hidden;
+      const value = isHtmlVisible
+        ? (textareaRef.current?.value ?? "")
+        : (editorRef.current?.innerHTML ?? "");
+      e.formData.set(name, value);
+    }
+
+    form.addEventListener("formdata", handleFormData);
+    return () => form.removeEventListener("formdata", handleFormData);
+  }, [name]);
 
   function sync(html?: string) {
     if (hiddenRef.current) {
@@ -125,6 +145,7 @@ export function RichTextEditor({
       </div>
 
       <textarea
+        ref={textareaRef}
         value={htmlValue}
         onChange={(e) => {
           setHtmlValue(e.target.value);
