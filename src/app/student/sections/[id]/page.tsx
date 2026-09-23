@@ -54,10 +54,10 @@ export default async function StudentSectionDetailPage({
             <li key={task.id}>
               <Link
                 href={`/student/tasks/${task.id}`}
-                className="flex items-center justify-between rounded-lg border border-gray-100 px-3 py-2 text-sm hover:bg-brown-50"
+                className="flex items-center justify-between rounded-lg border border-gray-100 px-3 py-2 text-[15px] hover:bg-brown-50"
               >
-                <span className="text-gray-700">{task.title}</span>
-                <span className="text-xs text-gray-500">
+                <span className="text-black">{task.title}</span>
+                <span className="text-[13px] text-black">
                   {STATUS_BADGE[progressMap.get(task.id) ?? "NOT_STARTED"]}
                 </span>
               </Link>
