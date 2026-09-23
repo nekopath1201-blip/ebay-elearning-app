@@ -29,12 +29,20 @@ export async function createTask(sectionId: string, formData: FormData) {
   revalidatePath("/student", "layout");
 }
 
-export async function updateTaskText(taskId: string, formData: FormData) {
+type UpdateTaskState = { success?: boolean; error?: string };
+
+export async function updateTaskText(
+  taskId: string,
+  _prevState: UpdateTaskState | undefined,
+  formData: FormData
+): Promise<UpdateTaskState> {
   await requireAdmin();
 
   const title = String(formData.get("title") || "").trim();
   const textBody = String(formData.get("textBody") || "").trim();
-  if (!title) return;
+  if (!title) {
+    return { error: "タイトルを入力してください" };
+  }
 
   const task = await prisma.task.update({
     where: { id: taskId },
@@ -44,6 +52,8 @@ export async function updateTaskText(taskId: string, formData: FormData) {
   revalidatePath(`/admin/sections/${task.sectionId}`);
   revalidatePath(`/admin/sections/${task.sectionId}/tasks/${taskId}`);
   revalidatePath("/student", "layout");
+
+  return { success: true };
 }
 
 export async function attachUploadedFile(

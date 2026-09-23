@@ -2,7 +2,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import {
-  updateTaskText,
   removeTaskVideo,
   removeTaskFile,
   removeTaskImage,
@@ -10,7 +9,7 @@ import {
 } from "@/app/actions/admin-tasks";
 import { FileUploader } from "@/components/admin/FileUploader";
 import { ConfirmSubmitButton } from "@/components/admin/ConfirmSubmitButton";
-import { RichTextEditor } from "@/components/admin/RichTextEditor";
+import { UpdateTaskForm } from "@/components/admin/UpdateTaskForm";
 
 export default async function AdminTaskDetailPage({
   params,
@@ -26,8 +25,6 @@ export default async function AdminTaskDetailPage({
 
   if (!task || task.sectionId !== id) notFound();
 
-  const updateTaskWithId = updateTaskText.bind(null, task.id);
-
   return (
     <div className="flex flex-col gap-8">
       <div>
@@ -41,25 +38,11 @@ export default async function AdminTaskDetailPage({
 
       <div className="rounded-xl bg-white p-6 shadow-sm">
         <h2 className="mb-4 text-sm font-semibold text-gray-700">課題情報</h2>
-        <form action={updateTaskWithId} className="flex flex-col gap-3">
-          <input
-            name="title"
-            defaultValue={task.title}
-            required
-            className="rounded-md border border-gray-300 px-3 py-2 text-sm"
-          />
-          <RichTextEditor
-            name="textBody"
-            defaultValue={task.textBody ?? ""}
-            placeholder="本文"
-          />
-          <button
-            type="submit"
-            className="self-start rounded-md bg-brown-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brown-600"
-          >
-            更新
-          </button>
-        </form>
+        <UpdateTaskForm
+          taskId={task.id}
+          title={task.title}
+          textBody={task.textBody ?? ""}
+        />
       </div>
 
       <div className="rounded-xl bg-white p-6 shadow-sm">
