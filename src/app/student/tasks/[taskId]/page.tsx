@@ -10,6 +10,7 @@ import {
 } from "@/lib/progress";
 import { CatMascot } from "@/components/CatMascot";
 import { ImageGallery } from "@/components/student/ImageGallery";
+import { TaskNoteForm } from "@/components/student/TaskNoteForm";
 
 export default async function StudentTaskDetailPage({
   params,
@@ -124,6 +125,8 @@ export default async function StudentTaskDetailPage({
             </form>
           )}
         </div>
+
+        <TaskNoteForm taskId={task.id} note={progress.note ?? ""} />
       </div>
 
       <CatMascot message={catMessage} />

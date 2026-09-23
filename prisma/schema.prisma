@@ -70,6 +70,7 @@ model Progress {
   task        Task           @relation(fields: [taskId], references: [id], onDelete: Cascade)
   taskId      String
   status      ProgressStatus @default(NOT_STARTED)
+  note        String?
   completedAt DateTime?
   updatedAt   DateTime       @updatedAt
 

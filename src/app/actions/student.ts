@@ -26,3 +26,25 @@ export async function markTaskComplete(taskId: string) {
 
   revalidatePath("/student", "layout");
 }
+
+type SaveNoteState = { success?: boolean };
+
+export async function saveTaskNote(
+  taskId: string,
+  _prevState: SaveNoteState | undefined,
+  formData: FormData
+): Promise<SaveNoteState> {
+  const user = await requireStudent();
+
+  const note = String(formData.get("note") || "").trim();
+
+  await prisma.progress.upsert({
+    where: { userId_taskId: { userId: user.id, taskId } },
+    create: { userId: user.id, taskId, note: note || null },
+    update: { note: note || null },
+  });
+
+  revalidatePath(`/student/tasks/${taskId}`);
+
+  return { success: true };
+}
