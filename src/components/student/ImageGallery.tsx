@@ -2,29 +2,35 @@
 
 import { useState } from "react";
 
-export function ImageGallery({ imageUrls }: { imageUrls: string[] }) {
-  const [selected, setSelected] = useState<string | null>(null);
+type GalleryImage = { url: string; title: string | null };
 
-  if (imageUrls.length === 0) return null;
+export function ImageGallery({ images }: { images: GalleryImage[] }) {
+  const [selected, setSelected] = useState<GalleryImage | null>(null);
+
+  if (images.length === 0) return null;
 
   return (
     <>
       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
-        {imageUrls.map((url) => (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            key={url}
-            src={url}
-            alt=""
-            onClick={() => setSelected(url)}
-            className="w-full cursor-pointer rounded-md border border-gray-100 transition-opacity hover:opacity-90"
-          />
+        {images.map((image) => (
+          <div key={image.url} className="flex flex-col gap-1">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={image.url}
+              alt={image.title ?? ""}
+              onClick={() => setSelected(image)}
+              className="w-full cursor-pointer rounded-md border border-gray-100 transition-opacity hover:opacity-90"
+            />
+            {image.title && (
+              <p className="text-sm text-gray-600">{image.title}</p>
+            )}
+          </div>
         ))}
       </div>
 
       {selected && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4"
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-3 bg-black/80 p-4"
           onClick={() => setSelected(null)}
         >
           <button
@@ -37,11 +43,14 @@ export function ImageGallery({ imageUrls }: { imageUrls: string[] }) {
           </button>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={selected}
-            alt=""
+            src={selected.url}
+            alt={selected.title ?? ""}
             onClick={(e) => e.stopPropagation()}
-            className="max-h-full max-w-full rounded-md object-contain"
+            className="max-h-[85vh] max-w-full rounded-md object-contain"
           />
+          {selected.title && (
+            <p className="text-sm text-white">{selected.title}</p>
+          )}
         </div>
       )}
     </>

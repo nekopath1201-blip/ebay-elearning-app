@@ -6,6 +6,7 @@ import {
   removeTaskVideo,
   removeTaskFile,
   removeTaskImage,
+  updateImageTitle,
 } from "@/app/actions/admin-tasks";
 import { FileUploader } from "@/components/admin/FileUploader";
 import { ConfirmSubmitButton } from "@/components/admin/ConfirmSubmitButton";
@@ -19,6 +20,7 @@ export default async function AdminTaskDetailPage({
 
   const task = await prisma.task.findUnique({
     where: { id: taskId },
+    include: { images: { orderBy: { order: "asc" } } },
   });
 
   if (!task || task.sectionId !== id) notFound();
@@ -104,20 +106,34 @@ export default async function AdminTaskDetailPage({
 
       <div className="rounded-xl bg-white p-6 shadow-sm">
         <h2 className="mb-4 text-sm font-semibold text-gray-700">画像</h2>
-        {task.imageUrls.length > 0 && (
-          <div className="mb-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {task.imageUrls.map((url) => (
-              <div key={url} className="relative">
+        {task.images.length > 0 && (
+          <div className="mb-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
+            {task.images.map((image) => (
+              <div key={image.id} className="flex flex-col gap-1">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={url}
+                  src={image.url}
                   alt=""
                   className="h-32 w-full rounded-md object-cover"
                 />
-                <form action={removeTaskImage.bind(null, task.id, url)}>
+                <form action={updateImageTitle.bind(null, image.id)} className="flex gap-1">
+                  <input
+                    name="title"
+                    defaultValue={image.title ?? ""}
+                    placeholder="画像タイトル"
+                    className="w-full rounded-md border border-gray-300 px-2 py-1 text-xs"
+                  />
+                  <button
+                    type="submit"
+                    className="shrink-0 rounded-md bg-brown-500 px-2 py-1 text-xs font-semibold text-white hover:bg-brown-600"
+                  >
+                    保存
+                  </button>
+                </form>
+                <form action={removeTaskImage.bind(null, image.id)}>
                   <ConfirmSubmitButton
                     confirmMessage="この画像を削除しますか？"
-                    className="mt-1 text-xs text-red-600 hover:text-red-700 hover:underline"
+                    className="text-xs text-red-600 hover:text-red-700 hover:underline"
                   >
                     削除
                   </ConfirmSubmitButton>

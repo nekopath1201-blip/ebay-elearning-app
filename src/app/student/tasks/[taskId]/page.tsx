@@ -22,7 +22,7 @@ export default async function StudentTaskDetailPage({
 
   const task = await prisma.task.findUnique({
     where: { id: taskId },
-    include: { section: true },
+    include: { section: true, images: { orderBy: { order: "asc" } } },
   });
 
   if (!task || !task.published || !task.section.published) notFound();
@@ -100,7 +100,12 @@ export default async function StudentTaskDetailPage({
           </a>
         )}
 
-        <ImageGallery imageUrls={task.imageUrls} />
+        <ImageGallery
+          images={task.images.map((image) => ({
+            url: image.url,
+            title: image.title,
+          }))}
+        />
 
         <div className="mt-6">
           {isCompleted ? (

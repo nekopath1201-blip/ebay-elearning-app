@@ -39,8 +39,8 @@ model Section {
 }
 
 model Task {
-  id        String     @id @default(cuid())
-  section   Section    @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  id        String      @id @default(cuid())
+  section   Section     @relation(fields: [sectionId], references: [id], onDelete: Cascade)
   sectionId String
   title     String
   order     Int
@@ -48,10 +48,19 @@ model Task {
   textBody  String?
   fileUrl   String?
   fileName  String?
-  imageUrls String[]   @default([])
-  published Boolean    @default(true)
-  createdAt DateTime   @default(now())
+  images    TaskImage[]
+  published Boolean     @default(true)
+  createdAt DateTime    @default(now())
   progress  Progress[]
+}
+
+model TaskImage {
+  id     String  @id @default(cuid())
+  task   Task    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  taskId String
+  url    String
+  title  String?
+  order  Int     @default(0)
 }
 
 model Progress {

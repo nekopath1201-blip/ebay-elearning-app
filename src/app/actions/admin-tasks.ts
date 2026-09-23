@@ -54,14 +54,18 @@ export async function attachUploadedFile(
 
   let task;
   if (data.kind === "image") {
-    const current = await prisma.task.findUniqueOrThrow({
-      where: { id: taskId },
-      select: { imageUrls: true, sectionId: true },
+    const maxOrder = await prisma.taskImage.aggregate({
+      where: { taskId },
+      _max: { order: true },
     });
-    task = await prisma.task.update({
-      where: { id: taskId },
-      data: { imageUrls: [...current.imageUrls, data.url] },
+    await prisma.taskImage.create({
+      data: {
+        taskId,
+        url: data.url,
+        order: (maxOrder._max.order ?? -1) + 1,
+      },
     });
+    task = await prisma.task.findUniqueOrThrow({ where: { id: taskId } });
   } else {
     task = await prisma.task.update({
       where: { id: taskId },
@@ -103,21 +107,32 @@ export async function removeTaskFile(taskId: string) {
   revalidatePath("/student", "layout");
 }
 
-export async function removeTaskImage(taskId: string, url: string) {
+export async function removeTaskImage(imageId: string) {
   await requireAdmin();
 
-  const current = await prisma.task.findUniqueOrThrow({
-    where: { id: taskId },
-    select: { imageUrls: true, sectionId: true },
+  const image = await prisma.taskImage.delete({
+    where: { id: imageId },
+    include: { task: true },
   });
 
-  const task = await prisma.task.update({
-    where: { id: taskId },
-    data: { imageUrls: current.imageUrls.filter((u) => u !== url) },
+  revalidatePath(`/admin/sections/${image.task.sectionId}`);
+  revalidatePath(`/admin/sections/${image.task.sectionId}/tasks/${image.taskId}`);
+  revalidatePath("/student", "layout");
+}
+
+export async function updateImageTitle(imageId: string, formData: FormData) {
+  await requireAdmin();
+
+  const title = String(formData.get("title") || "").trim();
+
+  const image = await prisma.taskImage.update({
+    where: { id: imageId },
+    data: { title: title || null },
+    include: { task: true },
   });
 
-  revalidatePath(`/admin/sections/${task.sectionId}`);
-  revalidatePath(`/admin/sections/${task.sectionId}/tasks/${taskId}`);
+  revalidatePath(`/admin/sections/${image.task.sectionId}`);
+  revalidatePath(`/admin/sections/${image.task.sectionId}/tasks/${image.taskId}`);
   revalidatePath("/student", "layout");
 }
 
