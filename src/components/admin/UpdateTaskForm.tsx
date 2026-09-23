@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { updateTaskText } from "@/app/actions/admin-tasks";
 import { RichTextEditor } from "@/components/admin/RichTextEditor";
 
@@ -18,6 +18,16 @@ export function UpdateTaskForm({
     updateTaskWithId,
     undefined
   );
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  useEffect(() => {
+    if (state?.success) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- intentional: show a toast that auto-dismisses via timer
+      setShowSuccess(true);
+      const timer = setTimeout(() => setShowSuccess(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [state]);
 
   return (
     <form action={formAction} className="flex flex-col gap-3">
@@ -30,7 +40,7 @@ export function UpdateTaskForm({
       <RichTextEditor name="textBody" defaultValue={textBody} placeholder="本文" />
 
       {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
-      {state?.success && (
+      {showSuccess && (
         <p className="text-sm text-green-600">更新できました</p>
       )}
 
