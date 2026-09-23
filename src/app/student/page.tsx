@@ -1,8 +1,8 @@
-import Link from "next/link";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 import { getCatMessage } from "@/lib/catMessages";
 import { CatMascot } from "@/components/CatMascot";
+import { SectionAccordion } from "@/components/student/SectionAccordion";
 
 export default async function StudentHomePage() {
   const session = await auth();
@@ -20,9 +20,9 @@ export default async function StudentHomePage() {
   });
 
   const progressList = await prisma.progress.findMany({
-    where: { userId, status: "COMPLETED" },
+    where: { userId },
   });
-  const completedTaskIds = new Set(progressList.map((p) => p.taskId));
+  const progressMap = new Map(progressList.map((p) => [p.taskId, p.status]));
 
   return (
     <div className="flex flex-col gap-6">
@@ -38,34 +38,26 @@ export default async function StudentHomePage() {
       )}
 
       {sections.map((section) => {
-        const completedCount = section.tasks.filter((t) =>
-          completedTaskIds.has(t.id)
+        const tasksWithStatus = section.tasks.map((task) => ({
+          id: task.id,
+          title: task.title,
+          status: progressMap.get(task.id) ?? "NOT_STARTED",
+        }));
+        const completedCount = tasksWithStatus.filter(
+          (t) => t.status === "COMPLETED"
         ).length;
-        const isSectionComplete =
-          section.tasks.length > 0 && completedCount === section.tasks.length;
 
         return (
-          <Link
+          <SectionAccordion
             key={section.id}
-            href={`/student/sections/${section.id}`}
-            className="flex items-center justify-between rounded-xl bg-white p-5 shadow-sm hover:shadow-md"
-          >
-            <div>
-              <h2 className="font-semibold text-gray-800">{section.title}</h2>
-              {section.description && (
-                <p className="mt-1 text-sm text-gray-500">{section.description}</p>
-              )}
-              <p className="mt-2 flex items-center gap-2 text-xs text-gray-500">
-                {isSectionComplete && (
-                  <span className="rounded-full bg-green-100 px-2 py-0.5 font-semibold text-green-700">
-                    完了
-                  </span>
-                )}
-                {completedCount} / {section.tasks.length} 課題完了
-              </p>
-            </div>
-            <span className="text-sm text-brown-600">→</span>
-          </Link>
+            section={{
+              id: section.id,
+              title: section.title,
+              description: section.description,
+              tasks: tasksWithStatus,
+              completedCount,
+            }}
+          />
         );
       })}
 
