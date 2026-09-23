@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import { deleteStudent } from "@/app/actions/admin-students";
 import { getTotalPublishedTaskCount } from "@/lib/progress";
@@ -20,6 +21,12 @@ export default async function AdminStudentsPage() {
 
   return (
     <div className="flex flex-col gap-8">
+      <div>
+        <Link href="/admin/settings" className="text-sm text-gray-500 hover:text-gray-700 hover:underline">
+          ← 設定に戻る
+        </Link>
+      </div>
+
       <div>
         <h1 className="text-xl font-bold text-gray-800">受講者管理</h1>
         <p className="mt-1 text-sm text-gray-500">

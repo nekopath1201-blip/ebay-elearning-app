@@ -1,8 +1,15 @@
+import Link from "next/link";
 import { ChangePasswordForm } from "@/components/account/ChangePasswordForm";
 
 export default function AdminPasswordPage() {
   return (
     <div className="flex flex-col gap-6">
+      <div>
+        <Link href="/admin/settings" className="text-sm text-gray-500 hover:text-gray-700 hover:underline">
+          ← 設定に戻る
+        </Link>
+      </div>
+
       <div>
         <h1 className="text-xl font-bold text-gray-800">パスワード変更</h1>
         <p className="mt-1 text-sm text-gray-500">
