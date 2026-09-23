@@ -22,6 +22,9 @@ export default function AdminLayout({
           </div>
           <nav className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
             <Link href="/admin/sections" className="whitespace-nowrap text-gray-600 hover:text-brown-600">
+              ホーム
+            </Link>
+            <Link href="/admin/sections" className="whitespace-nowrap text-gray-600 hover:text-brown-600">
               セクション管理
             </Link>
             <Link href="/admin/students" className="whitespace-nowrap text-gray-600 hover:text-brown-600">
