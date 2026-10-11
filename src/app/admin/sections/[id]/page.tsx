@@ -166,7 +166,7 @@ export default async function AdminSectionDetailPage({
 
       <div className="rounded-xl bg-white p-6 shadow-sm">
         <h2 className="mb-4 text-sm font-semibold text-gray-700">
-          さらにタスクを追加
+          タスクを追加
         </h2>
         <form action={createTaskWithId} className="flex flex-col gap-3">
           <input
