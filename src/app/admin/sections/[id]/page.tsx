@@ -163,6 +163,35 @@ export default async function AdminSectionDetailPage({
           </div>
         ))}
       </div>
+
+      <div className="rounded-xl bg-white p-6 shadow-sm">
+        <h2 className="mb-4 text-sm font-semibold text-gray-700">
+          さらに課題を追加
+        </h2>
+        <form action={createTaskWithId} className="flex flex-col gap-3">
+          <input
+            name="title"
+            placeholder="課題タイトル"
+            required
+            className="rounded-md border border-gray-300 px-3 py-2 text-sm"
+          />
+          <textarea
+            name="textBody"
+            placeholder="テキスト内容（あとから編集画面でも変更できます）"
+            rows={2}
+            className="rounded-md border border-gray-300 px-3 py-2 text-sm"
+          />
+          <p className="text-xs text-gray-500">
+            動画・画像・ファイルの添付は、作成後の編集画面から行えます。
+          </p>
+          <button
+            type="submit"
+            className="self-start rounded-md bg-brown-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brown-600"
+          >
+            課題を追加
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
