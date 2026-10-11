@@ -2,15 +2,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
-import { markTaskComplete } from "@/app/actions/student";
-import { getCatMessage } from "@/lib/catMessages";
-import {
-  getTotalPublishedTaskCount,
-  getUserCompletedTaskCount,
-} from "@/lib/progress";
-import { CatMascot } from "@/components/CatMascot";
-import { ImageGallery } from "@/components/student/ImageGallery";
-import { TaskNoteForm } from "@/components/student/TaskNoteForm";
+
+const STATUS_BADGE: Record<string, string> = {
+  NOT_STARTED: "⬜ 未着手",
+  IN_PROGRESS: "🟡 進行中",
+  COMPLETED: "✅ 完了",
+};
 
 export default async function StudentTaskDetailPage({
   params,
@@ -23,51 +20,21 @@ export default async function StudentTaskDetailPage({
 
   const task = await prisma.task.findUnique({
     where: { id: taskId },
-    include: { section: true, images: { orderBy: { order: "asc" } } },
+    include: {
+      section: true,
+      subTasks: {
+        where: { published: true },
+        orderBy: { order: "asc" },
+      },
+    },
   });
 
   if (!task || !task.published || !task.section.published) notFound();
 
-  let progress = await prisma.progress.findUnique({
-    where: { userId_taskId: { userId, taskId } },
+  const progressList = await prisma.progress.findMany({
+    where: { userId, subTaskId: { in: task.subTasks.map((s) => s.id) } },
   });
-
-  if (!progress) {
-    progress = await prisma.progress.create({
-      data: { userId, taskId, status: "IN_PROGRESS" },
-    });
-  }
-
-  const isCompleted = progress.status === "COMPLETED";
-
-  let catMessage = getCatMessage("task_start");
-  if (isCompleted) {
-    const [totalTasks, completedTasks, sectionTasks, sectionCompleted] =
-      await Promise.all([
-        getTotalPublishedTaskCount(),
-        getUserCompletedTaskCount(userId),
-        prisma.task.count({
-          where: { sectionId: task.sectionId, published: true },
-        }),
-        prisma.progress.count({
-          where: {
-            userId,
-            status: "COMPLETED",
-            task: { sectionId: task.sectionId, published: true },
-          },
-        }),
-      ]);
-
-    if (completedTasks >= totalTasks) {
-      catMessage = getCatMessage("all_complete");
-    } else if (sectionCompleted >= sectionTasks) {
-      catMessage = getCatMessage("section_complete");
-    } else {
-      catMessage = getCatMessage("task_complete");
-    }
-  }
-
-  const markCompleteWithTaskId = markTaskComplete.bind(null, task.id);
+  const progressMap = new Map(progressList.map((p) => [p.subTaskId, p.status]));
 
   return (
     <div className="flex flex-col gap-6">
@@ -78,58 +45,31 @@ export default async function StudentTaskDetailPage({
         ← {task.section.title}に戻る
       </Link>
 
-      <div className="rounded-xl bg-white p-6 shadow-sm">
+      <div>
         <p className="text-xs text-gray-400">{task.section.title}</p>
-        <h1 className="mt-1 text-lg font-bold text-gray-800">{task.title}</h1>
-
-        {task.textBody && (
-          <div
-            className="mt-4 whitespace-pre-wrap text-sm text-gray-700"
-            dangerouslySetInnerHTML={{ __html: task.textBody }}
-          />
-        )}
-
-        {task.videoUrl && (
-          <video src={task.videoUrl} controls className="mt-4 w-full rounded-md" />
-        )}
-
-        {task.fileUrl && (
-          <a
-            href={task.fileUrl}
-            className="mt-4 inline-block rounded-md bg-brown-100 px-4 py-2 text-sm text-brown-700 hover:bg-brown-200"
-          >
-            📄 {task.fileName ?? "ファイルをダウンロード"}
-          </a>
-        )}
-
-        <ImageGallery
-          images={task.images.map((image) => ({
-            url: image.url,
-            title: image.title,
-          }))}
-        />
-
-        <div className="mt-6">
-          {isCompleted ? (
-            <span className="rounded-md bg-green-50 px-4 py-2 text-sm text-green-700">
-              ✅ この課題は完了しています
-            </span>
-          ) : (
-            <form action={markCompleteWithTaskId}>
-              <button
-                type="submit"
-                className="rounded-md bg-brown-500 px-5 py-2 text-sm font-semibold text-white hover:bg-brown-600"
-              >
-                完了にする
-              </button>
-            </form>
-          )}
-        </div>
-
-        <TaskNoteForm taskId={task.id} note={progress.note ?? ""} />
+        <h1 className="mt-1 text-xl font-bold text-gray-800">{task.title}</h1>
       </div>
 
-      <CatMascot message={catMessage} />
+      <div className="rounded-xl bg-white p-5 shadow-sm">
+        <ul className="flex flex-col gap-2">
+          {task.subTasks.map((subTask) => (
+            <li key={subTask.id}>
+              <Link
+                href={`/student/subtasks/${subTask.id}`}
+                className="flex items-center justify-between rounded-lg border border-gray-100 px-3 py-2 text-[15px] hover:bg-brown-50"
+              >
+                <span className="text-black">{subTask.title}</span>
+                <span className="text-[13px] text-black">
+                  {STATUS_BADGE[progressMap.get(subTask.id) ?? "NOT_STARTED"]}
+                </span>
+              </Link>
+            </li>
+          ))}
+          {task.subTasks.length === 0 && (
+            <p className="text-xs text-gray-400">タスクがまだありません。</p>
+          )}
+        </ul>
+      </div>
     </div>
   );
 }

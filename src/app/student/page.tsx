@@ -15,14 +15,17 @@ export default async function StudentHomePage() {
       tasks: {
         where: { published: true },
         orderBy: { order: "asc" },
+        include: {
+          subTasks: { where: { published: true } },
+        },
       },
     },
   });
 
   const progressList = await prisma.progress.findMany({
-    where: { userId },
+    where: { userId, status: "COMPLETED" },
   });
-  const progressMap = new Map(progressList.map((p) => [p.taskId, p.status]));
+  const completedSubTaskIds = new Set(progressList.map((p) => p.subTaskId));
 
   return (
     <div className="flex flex-col gap-6">
@@ -38,14 +41,25 @@ export default async function StudentHomePage() {
       )}
 
       {sections.map((section) => {
-        const tasksWithStatus = section.tasks.map((task) => ({
-          id: task.id,
-          title: task.title,
-          status: progressMap.get(task.id) ?? "NOT_STARTED",
-        }));
-        const completedCount = tasksWithStatus.filter(
-          (t) => t.status === "COMPLETED"
-        ).length;
+        const tasksWithProgress = section.tasks.map((task) => {
+          const completedCount = task.subTasks.filter((s) =>
+            completedSubTaskIds.has(s.id)
+          ).length;
+          return {
+            id: task.id,
+            title: task.title,
+            completedCount,
+            totalCount: task.subTasks.length,
+          };
+        });
+        const completedCount = tasksWithProgress.reduce(
+          (sum, t) => sum + t.completedCount,
+          0
+        );
+        const totalCount = tasksWithProgress.reduce(
+          (sum, t) => sum + t.totalCount,
+          0
+        );
 
         return (
           <SectionAccordion
@@ -54,8 +68,9 @@ export default async function StudentHomePage() {
               id: section.id,
               title: section.title,
               description: section.description,
-              tasks: tasksWithStatus,
+              tasks: tasksWithProgress,
               completedCount,
+              totalCount,
             }}
           />
         );

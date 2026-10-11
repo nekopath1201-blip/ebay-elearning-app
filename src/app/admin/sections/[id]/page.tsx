@@ -84,14 +84,8 @@ export default async function AdminSectionDetailPage({
             required
             className="rounded-md border border-gray-300 px-3 py-2 text-sm"
           />
-          <textarea
-            name="textBody"
-            placeholder="テキスト内容（あとから編集画面でも変更できます）"
-            rows={2}
-            className="rounded-md border border-gray-300 px-3 py-2 text-sm"
-          />
           <p className="text-xs text-gray-500">
-            動画・画像・ファイルの添付は、作成後の編集画面から行えます。
+            テキスト・動画・画像・ファイルを持つ「タスク」の追加は、作成後の編集画面から行えます。
           </p>
           <button
             type="submit"
@@ -166,7 +160,7 @@ export default async function AdminSectionDetailPage({
 
       <div className="rounded-xl bg-white p-6 shadow-sm">
         <h2 className="mb-4 text-sm font-semibold text-gray-700">
-          タスクを追加
+          課題を追加
         </h2>
         <form action={createTaskWithId} className="flex flex-col gap-3">
           <input
@@ -175,14 +169,8 @@ export default async function AdminSectionDetailPage({
             required
             className="rounded-md border border-gray-300 px-3 py-2 text-sm"
           />
-          <textarea
-            name="textBody"
-            placeholder="テキスト内容（あとから編集画面でも変更できます）"
-            rows={2}
-            className="rounded-md border border-gray-300 px-3 py-2 text-sm"
-          />
           <p className="text-xs text-gray-500">
-            動画・画像・ファイルの添付は、作成後の編集画面から行えます。
+            テキスト・動画・画像・ファイルを持つ「タスク」の追加は、作成後の編集画面から行えます。
           </p>
           <button
             type="submit"

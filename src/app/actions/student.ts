@@ -10,14 +10,14 @@ async function requireStudent() {
   return session.user;
 }
 
-export async function markTaskComplete(taskId: string) {
+export async function markTaskComplete(subTaskId: string) {
   const user = await requireStudent();
 
   await prisma.progress.upsert({
-    where: { userId_taskId: { userId: user.id, taskId } },
+    where: { userId_subTaskId: { userId: user.id, subTaskId } },
     create: {
       userId: user.id,
-      taskId,
+      subTaskId,
       status: "COMPLETED",
       completedAt: new Date(),
     },
@@ -30,7 +30,7 @@ export async function markTaskComplete(taskId: string) {
 type SaveNoteState = { success?: boolean };
 
 export async function saveTaskNote(
-  taskId: string,
+  subTaskId: string,
   _prevState: SaveNoteState | undefined,
   formData: FormData
 ): Promise<SaveNoteState> {
@@ -39,12 +39,12 @@ export async function saveTaskNote(
   const note = String(formData.get("note") || "").trim();
 
   await prisma.progress.upsert({
-    where: { userId_taskId: { userId: user.id, taskId } },
-    create: { userId: user.id, taskId, note: note || null },
+    where: { userId_subTaskId: { userId: user.id, subTaskId } },
+    create: { userId: user.id, subTaskId, note: note || null },
     update: { note: note || null },
   });
 
-  revalidatePath(`/student/tasks/${taskId}`);
+  revalidatePath(`/student/subtasks/${subTaskId}`);
 
   return { success: true };
 }

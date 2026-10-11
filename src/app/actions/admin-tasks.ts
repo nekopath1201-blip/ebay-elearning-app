@@ -8,7 +8,6 @@ export async function createTask(sectionId: string, formData: FormData) {
   await requireAdmin();
 
   const title = String(formData.get("title") || "").trim();
-  const textBody = String(formData.get("textBody") || "").trim();
   if (!title) return;
 
   const maxOrder = await prisma.task.aggregate({
@@ -21,7 +20,6 @@ export async function createTask(sectionId: string, formData: FormData) {
       sectionId,
       title,
       order: (maxOrder._max.order ?? 0) + 1,
-      textBody: textBody || null,
     },
   });
 
@@ -31,7 +29,7 @@ export async function createTask(sectionId: string, formData: FormData) {
 
 type UpdateTaskState = { success?: boolean; error?: string };
 
-export async function updateTaskText(
+export async function updateTaskTitle(
   taskId: string,
   _prevState: UpdateTaskState | undefined,
   formData: FormData
@@ -39,14 +37,13 @@ export async function updateTaskText(
   await requireAdmin();
 
   const title = String(formData.get("title") || "").trim();
-  const textBody = String(formData.get("textBody") || "").trim();
   if (!title) {
     return { error: "タイトルを入力してください" };
   }
 
   const task = await prisma.task.update({
     where: { id: taskId },
-    data: { title, textBody: textBody || null },
+    data: { title },
   });
 
   revalidatePath(`/admin/sections/${task.sectionId}`);
@@ -54,96 +51,6 @@ export async function updateTaskText(
   revalidatePath("/student", "layout");
 
   return { success: true };
-}
-
-export async function attachUploadedFile(
-  taskId: string,
-  data: { url: string; fileName: string; kind: "video" | "file" | "image" }
-) {
-  await requireAdmin();
-
-  let task;
-  if (data.kind === "image") {
-    const maxOrder = await prisma.taskImage.aggregate({
-      where: { taskId },
-      _max: { order: true },
-    });
-    await prisma.taskImage.create({
-      data: {
-        taskId,
-        url: data.url,
-        order: (maxOrder._max.order ?? -1) + 1,
-      },
-    });
-    task = await prisma.task.findUniqueOrThrow({ where: { id: taskId } });
-  } else {
-    task = await prisma.task.update({
-      where: { id: taskId },
-      data:
-        data.kind === "video"
-          ? { videoUrl: data.url }
-          : { fileUrl: data.url, fileName: data.fileName },
-    });
-  }
-
-  revalidatePath(`/admin/sections/${task.sectionId}`);
-  revalidatePath(`/admin/sections/${task.sectionId}/tasks/${taskId}`);
-  revalidatePath("/student", "layout");
-}
-
-export async function removeTaskVideo(taskId: string) {
-  await requireAdmin();
-
-  const task = await prisma.task.update({
-    where: { id: taskId },
-    data: { videoUrl: null },
-  });
-
-  revalidatePath(`/admin/sections/${task.sectionId}`);
-  revalidatePath(`/admin/sections/${task.sectionId}/tasks/${taskId}`);
-  revalidatePath("/student", "layout");
-}
-
-export async function removeTaskFile(taskId: string) {
-  await requireAdmin();
-
-  const task = await prisma.task.update({
-    where: { id: taskId },
-    data: { fileUrl: null, fileName: null },
-  });
-
-  revalidatePath(`/admin/sections/${task.sectionId}`);
-  revalidatePath(`/admin/sections/${task.sectionId}/tasks/${taskId}`);
-  revalidatePath("/student", "layout");
-}
-
-export async function removeTaskImage(imageId: string) {
-  await requireAdmin();
-
-  const image = await prisma.taskImage.delete({
-    where: { id: imageId },
-    include: { task: true },
-  });
-
-  revalidatePath(`/admin/sections/${image.task.sectionId}`);
-  revalidatePath(`/admin/sections/${image.task.sectionId}/tasks/${image.taskId}`);
-  revalidatePath("/student", "layout");
-}
-
-export async function updateImageTitle(imageId: string, formData: FormData) {
-  await requireAdmin();
-
-  const title = String(formData.get("title") || "").trim();
-
-  const image = await prisma.taskImage.update({
-    where: { id: imageId },
-    data: { title: title || null },
-    include: { task: true },
-  });
-
-  revalidatePath(`/admin/sections/${image.task.sectionId}`);
-  revalidatePath(`/admin/sections/${image.task.sectionId}/tasks/${image.taskId}`);
-  revalidatePath("/student", "layout");
 }
 
 export async function deleteTask(taskId: string) {
@@ -177,5 +84,207 @@ export async function moveTask(
   ]);
 
   revalidatePath(`/admin/sections/${sectionId}`);
+  revalidatePath("/student", "layout");
+}
+
+export async function createSubTask(taskId: string, formData: FormData) {
+  await requireAdmin();
+
+  const title = String(formData.get("title") || "").trim();
+  const textBody = String(formData.get("textBody") || "").trim();
+  if (!title) return;
+
+  const task = await prisma.task.findUniqueOrThrow({ where: { id: taskId } });
+
+  const maxOrder = await prisma.subTask.aggregate({
+    where: { taskId },
+    _max: { order: true },
+  });
+
+  await prisma.subTask.create({
+    data: {
+      taskId,
+      title,
+      order: (maxOrder._max.order ?? 0) + 1,
+      textBody: textBody || null,
+    },
+  });
+
+  revalidatePath(`/admin/sections/${task.sectionId}/tasks/${taskId}`);
+  revalidatePath("/student", "layout");
+}
+
+type UpdateSubTaskState = { success?: boolean; error?: string };
+
+export async function updateSubTaskText(
+  subTaskId: string,
+  _prevState: UpdateSubTaskState | undefined,
+  formData: FormData
+): Promise<UpdateSubTaskState> {
+  await requireAdmin();
+
+  const title = String(formData.get("title") || "").trim();
+  const textBody = String(formData.get("textBody") || "").trim();
+  if (!title) {
+    return { error: "タイトルを入力してください" };
+  }
+
+  const subTask = await prisma.subTask.update({
+    where: { id: subTaskId },
+    data: { title, textBody: textBody || null },
+    include: { task: true },
+  });
+
+  revalidatePath(`/admin/sections/${subTask.task.sectionId}/tasks/${subTask.taskId}`);
+  revalidatePath(
+    `/admin/sections/${subTask.task.sectionId}/tasks/${subTask.taskId}/subtasks/${subTaskId}`
+  );
+  revalidatePath("/student", "layout");
+
+  return { success: true };
+}
+
+export async function deleteSubTask(subTaskId: string) {
+  await requireAdmin();
+  const subTask = await prisma.subTask.delete({
+    where: { id: subTaskId },
+    include: { task: true },
+  });
+  revalidatePath(`/admin/sections/${subTask.task.sectionId}/tasks/${subTask.taskId}`);
+  revalidatePath("/student", "layout");
+}
+
+export async function moveSubTask(
+  taskId: string,
+  subTaskId: string,
+  direction: "up" | "down"
+) {
+  await requireAdmin();
+
+  const task = await prisma.task.findUniqueOrThrow({ where: { id: taskId } });
+
+  const subTasks = await prisma.subTask.findMany({
+    where: { taskId },
+    orderBy: { order: "asc" },
+  });
+  const index = subTasks.findIndex((t) => t.id === subTaskId);
+  const swapIndex = direction === "up" ? index - 1 : index + 1;
+  if (index === -1 || swapIndex < 0 || swapIndex >= subTasks.length) return;
+
+  const current = subTasks[index];
+  const target = subTasks[swapIndex];
+
+  await prisma.$transaction([
+    prisma.subTask.update({ where: { id: current.id }, data: { order: target.order } }),
+    prisma.subTask.update({ where: { id: target.id }, data: { order: current.order } }),
+  ]);
+
+  revalidatePath(`/admin/sections/${task.sectionId}/tasks/${taskId}`);
+  revalidatePath("/student", "layout");
+}
+
+export async function attachUploadedFile(
+  subTaskId: string,
+  data: { url: string; fileName: string; kind: "video" | "file" | "image" }
+) {
+  await requireAdmin();
+
+  let subTask;
+  if (data.kind === "image") {
+    const maxOrder = await prisma.taskImage.aggregate({
+      where: { subTaskId },
+      _max: { order: true },
+    });
+    await prisma.taskImage.create({
+      data: {
+        subTaskId,
+        url: data.url,
+        order: (maxOrder._max.order ?? -1) + 1,
+      },
+    });
+    subTask = await prisma.subTask.findUniqueOrThrow({
+      where: { id: subTaskId },
+      include: { task: true },
+    });
+  } else {
+    subTask = await prisma.subTask.update({
+      where: { id: subTaskId },
+      data:
+        data.kind === "video"
+          ? { videoUrl: data.url }
+          : { fileUrl: data.url, fileName: data.fileName },
+      include: { task: true },
+    });
+  }
+
+  revalidatePath(`/admin/sections/${subTask.task.sectionId}/tasks/${subTask.taskId}`);
+  revalidatePath(
+    `/admin/sections/${subTask.task.sectionId}/tasks/${subTask.taskId}/subtasks/${subTaskId}`
+  );
+  revalidatePath("/student", "layout");
+}
+
+export async function removeTaskVideo(subTaskId: string) {
+  await requireAdmin();
+
+  const subTask = await prisma.subTask.update({
+    where: { id: subTaskId },
+    data: { videoUrl: null },
+    include: { task: true },
+  });
+
+  revalidatePath(`/admin/sections/${subTask.task.sectionId}/tasks/${subTask.taskId}`);
+  revalidatePath(
+    `/admin/sections/${subTask.task.sectionId}/tasks/${subTask.taskId}/subtasks/${subTaskId}`
+  );
+  revalidatePath("/student", "layout");
+}
+
+export async function removeTaskFile(subTaskId: string) {
+  await requireAdmin();
+
+  const subTask = await prisma.subTask.update({
+    where: { id: subTaskId },
+    data: { fileUrl: null, fileName: null },
+    include: { task: true },
+  });
+
+  revalidatePath(`/admin/sections/${subTask.task.sectionId}/tasks/${subTask.taskId}`);
+  revalidatePath(
+    `/admin/sections/${subTask.task.sectionId}/tasks/${subTask.taskId}/subtasks/${subTaskId}`
+  );
+  revalidatePath("/student", "layout");
+}
+
+export async function removeTaskImage(imageId: string) {
+  await requireAdmin();
+
+  const image = await prisma.taskImage.delete({
+    where: { id: imageId },
+    include: { subTask: { include: { task: true } } },
+  });
+
+  revalidatePath(`/admin/sections/${image.subTask.task.sectionId}/tasks/${image.subTask.taskId}`);
+  revalidatePath(
+    `/admin/sections/${image.subTask.task.sectionId}/tasks/${image.subTask.taskId}/subtasks/${image.subTaskId}`
+  );
+  revalidatePath("/student", "layout");
+}
+
+export async function updateImageTitle(imageId: string, formData: FormData) {
+  await requireAdmin();
+
+  const title = String(formData.get("title") || "").trim();
+
+  const image = await prisma.taskImage.update({
+    where: { id: imageId },
+    data: { title: title || null },
+    include: { subTask: { include: { task: true } } },
+  });
+
+  revalidatePath(`/admin/sections/${image.subTask.task.sectionId}/tasks/${image.subTask.taskId}`);
+  revalidatePath(
+    `/admin/sections/${image.subTask.task.sectionId}/tasks/${image.subTask.taskId}/subtasks/${image.subTaskId}`
+  );
   revalidatePath("/student", "layout");
 }

@@ -1,19 +1,16 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
-import { updateTaskText } from "@/app/actions/admin-tasks";
-import { RichTextEditor } from "@/components/admin/RichTextEditor";
+import { updateTaskTitle } from "@/app/actions/admin-tasks";
 
 export function UpdateTaskForm({
   taskId,
   title,
-  textBody,
 }: {
   taskId: string;
   title: string;
-  textBody: string;
 }) {
-  const updateTaskWithId = updateTaskText.bind(null, taskId);
+  const updateTaskWithId = updateTaskTitle.bind(null, taskId);
   const [state, formAction, isPending] = useActionState(
     updateTaskWithId,
     undefined
@@ -37,7 +34,6 @@ export function UpdateTaskForm({
         required
         className="rounded-md border border-gray-300 px-3 py-2 text-sm"
       />
-      <RichTextEditor name="textBody" defaultValue={textBody} placeholder="本文" />
 
       {state?.error && <p className="text-sm text-red-600">{state.error}</p>}
       {showSuccess && (

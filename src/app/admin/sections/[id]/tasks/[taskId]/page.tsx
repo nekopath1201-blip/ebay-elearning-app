@@ -1,13 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
-import {
-  removeTaskVideo,
-  removeTaskFile,
-  removeTaskImage,
-  updateImageTitle,
-} from "@/app/actions/admin-tasks";
-import { FileUploader } from "@/components/admin/FileUploader";
+import { createSubTask, deleteSubTask, moveSubTask } from "@/app/actions/admin-tasks";
 import { ConfirmSubmitButton } from "@/components/admin/ConfirmSubmitButton";
 import { UpdateTaskForm } from "@/components/admin/UpdateTaskForm";
 
@@ -20,10 +14,12 @@ export default async function AdminTaskDetailPage({
 
   const task = await prisma.task.findUnique({
     where: { id: taskId },
-    include: { images: { orderBy: { order: "asc" } } },
+    include: { subTasks: { orderBy: { order: "asc" } } },
   });
 
   if (!task || task.sectionId !== id) notFound();
+
+  const createSubTaskWithId = createSubTask.bind(null, task.id);
 
   return (
     <div className="flex flex-col gap-8">
@@ -38,95 +34,96 @@ export default async function AdminTaskDetailPage({
 
       <div className="rounded-xl bg-white p-6 shadow-sm">
         <h2 className="mb-4 text-sm font-semibold text-gray-700">課題情報</h2>
-        <UpdateTaskForm
-          taskId={task.id}
-          title={task.title}
-          textBody={task.textBody ?? ""}
-        />
+        <UpdateTaskForm taskId={task.id} title={task.title} />
       </div>
 
-      <div className="rounded-xl bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-sm font-semibold text-gray-700">動画</h2>
-        {task.videoUrl && (
-          <div className="mb-4">
-            <video src={task.videoUrl} controls className="w-full max-w-md rounded-md" />
-            <form action={removeTaskVideo.bind(null, task.id)} className="mt-1">
-              <ConfirmSubmitButton
-                confirmMessage="この動画を削除しますか？"
-                className="text-xs text-red-600 hover:text-red-700 hover:underline"
-              >
-                削除
-              </ConfirmSubmitButton>
-            </form>
-          </div>
+      <div className="flex flex-col gap-3">
+        <h2 className="text-sm font-semibold text-gray-700">タスク一覧</h2>
+        {task.subTasks.length === 0 && (
+          <p className="text-sm text-gray-500">まだタスクがありません。</p>
         )}
-        <FileUploader taskId={task.id} kind="video" accept="video/*" />
-      </div>
-
-      <div className="rounded-xl bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-sm font-semibold text-gray-700">ファイル</h2>
-        {task.fileUrl && (
-          <div className="mb-4 flex items-center gap-3 text-sm">
-            <span>
-              現在のファイル:{" "}
-              <a href={task.fileUrl} className="text-brown-600 hover:text-brown-700 hover:underline">
-                {task.fileName}
-              </a>
-            </span>
-            <form action={removeTaskFile.bind(null, task.id)}>
-              <ConfirmSubmitButton
-                confirmMessage="このファイルを削除しますか？"
-                className="text-xs text-red-600 hover:text-red-700 hover:underline"
-              >
-                削除
-              </ConfirmSubmitButton>
-            </form>
-          </div>
-        )}
-        <FileUploader taskId={task.id} kind="file" accept="*/*" />
-      </div>
-
-      <div className="rounded-xl bg-white p-6 shadow-sm">
-        <h2 className="mb-4 text-sm font-semibold text-gray-700">画像</h2>
-        {task.images.length > 0 && (
-          <div className="mb-4 grid grid-cols-2 gap-4 sm:grid-cols-3">
-            {task.images.map((image) => (
-              <div key={image.id} className="flex flex-col gap-1">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={image.url}
-                  alt=""
-                  className="h-32 w-full rounded-md object-cover"
-                />
-                {image.title && (
-                  <p className="text-xs text-gray-700">{image.title}</p>
-                )}
-                <form action={updateImageTitle.bind(null, image.id)} className="flex gap-1">
-                  <input
-                    name="title"
-                    placeholder="画像タイトル"
-                    className="w-full rounded-md border border-gray-300 px-2 py-1 text-xs"
-                  />
+        {task.subTasks.map((subTask, index) => (
+          <div
+            key={subTask.id}
+            className="relative flex items-center justify-between rounded-xl bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
+          >
+            <Link
+              href={`/admin/sections/${id}/tasks/${taskId}/subtasks/${subTask.id}`}
+              className="absolute inset-0 z-0"
+              aria-label={`${subTask.title}を編集`}
+            />
+            <div className="pointer-events-none relative z-10 flex items-center gap-3">
+              <div className="pointer-events-auto flex flex-col">
+                <form action={moveSubTask.bind(null, task.id, subTask.id, "up")}>
                   <button
                     type="submit"
-                    className="shrink-0 rounded-md bg-brown-500 px-2 py-1 text-xs font-semibold text-white hover:bg-brown-600"
+                    disabled={index === 0}
+                    aria-label="上に移動"
+                    className="text-gray-400 hover:text-brown-600 disabled:opacity-20"
                   >
-                    保存
+                    ▲
                   </button>
                 </form>
-                <form action={removeTaskImage.bind(null, image.id)}>
-                  <ConfirmSubmitButton
-                    confirmMessage="この画像を削除しますか？"
-                    className="text-xs text-red-600 hover:text-red-700 hover:underline"
+                <form action={moveSubTask.bind(null, task.id, subTask.id, "down")}>
+                  <button
+                    type="submit"
+                    disabled={index === task.subTasks.length - 1}
+                    aria-label="下に移動"
+                    className="text-gray-400 hover:text-brown-600 disabled:opacity-20"
                   >
-                    削除
-                  </ConfirmSubmitButton>
+                    ▼
+                  </button>
                 </form>
               </div>
-            ))}
+              <div>
+                <p className="font-semibold text-gray-800">{subTask.title}</p>
+                {!subTask.published && (
+                  <p className="text-xs text-gray-500">（非公開）</p>
+                )}
+              </div>
+            </div>
+            <div className="pointer-events-none relative z-10 flex items-center gap-3">
+              <span className="pointer-events-none rounded-md border border-brown-600 px-3 py-1 text-sm text-brown-600">
+                編集
+              </span>
+              <form action={deleteSubTask.bind(null, subTask.id)} className="pointer-events-auto">
+                <ConfirmSubmitButton
+                  confirmMessage="このタスクを削除します。よろしいですか？"
+                  className="text-sm text-red-600 hover:text-red-700 hover:underline"
+                >
+                  削除
+                </ConfirmSubmitButton>
+              </form>
+            </div>
           </div>
-        )}
-        <FileUploader taskId={task.id} kind="image" accept="image/*" />
+        ))}
+      </div>
+
+      <div className="rounded-xl bg-white p-6 shadow-sm">
+        <h2 className="mb-4 text-sm font-semibold text-gray-700">タスクを追加</h2>
+        <form action={createSubTaskWithId} className="flex flex-col gap-3">
+          <input
+            name="title"
+            placeholder="タスクタイトル"
+            required
+            className="rounded-md border border-gray-300 px-3 py-2 text-sm"
+          />
+          <textarea
+            name="textBody"
+            placeholder="テキスト内容（あとから編集画面でも変更できます）"
+            rows={2}
+            className="rounded-md border border-gray-300 px-3 py-2 text-sm"
+          />
+          <p className="text-xs text-gray-500">
+            動画・画像・ファイルの添付は、作成後の編集画面から行えます。
+          </p>
+          <button
+            type="submit"
+            className="self-start rounded-md bg-brown-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brown-600"
+          >
+            タスクを追加
+          </button>
+        </form>
       </div>
     </div>
   );

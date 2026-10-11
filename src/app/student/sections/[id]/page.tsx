@@ -3,12 +3,6 @@ import { notFound } from "next/navigation";
 import { auth } from "@/auth";
 import { prisma } from "@/lib/prisma";
 
-const STATUS_BADGE: Record<string, string> = {
-  NOT_STARTED: "⬜ 未着手",
-  IN_PROGRESS: "🟡 進行中",
-  COMPLETED: "✅ 完了",
-};
-
 export default async function StudentSectionDetailPage({
   params,
 }: {
@@ -24,16 +18,20 @@ export default async function StudentSectionDetailPage({
       tasks: {
         where: { published: true },
         orderBy: { order: "asc" },
+        include: {
+          subTasks: { where: { published: true } },
+        },
       },
     },
   });
 
   if (!section || !section.published) notFound();
 
+  const allSubTaskIds = section.tasks.flatMap((t) => t.subTasks.map((s) => s.id));
   const progressList = await prisma.progress.findMany({
-    where: { userId, taskId: { in: section.tasks.map((t) => t.id) } },
+    where: { userId, subTaskId: { in: allSubTaskIds }, status: "COMPLETED" },
   });
-  const progressMap = new Map(progressList.map((p) => [p.taskId, p.status]));
+  const completedSubTaskIds = new Set(progressList.map((p) => p.subTaskId));
 
   return (
     <div className="flex flex-col gap-6">
@@ -50,19 +48,24 @@ export default async function StudentSectionDetailPage({
 
       <div className="rounded-xl bg-white p-5 shadow-sm">
         <ul className="flex flex-col gap-2">
-          {section.tasks.map((task) => (
-            <li key={task.id}>
-              <Link
-                href={`/student/tasks/${task.id}`}
-                className="flex items-center justify-between rounded-lg border border-gray-100 px-3 py-2 text-[15px] hover:bg-brown-50"
-              >
-                <span className="text-black">{task.title}</span>
-                <span className="text-[13px] text-black">
-                  {STATUS_BADGE[progressMap.get(task.id) ?? "NOT_STARTED"]}
-                </span>
-              </Link>
-            </li>
-          ))}
+          {section.tasks.map((task) => {
+            const completedCount = task.subTasks.filter((s) =>
+              completedSubTaskIds.has(s.id)
+            ).length;
+            return (
+              <li key={task.id}>
+                <Link
+                  href={`/student/tasks/${task.id}`}
+                  className="flex items-center justify-between rounded-lg border border-gray-100 px-3 py-2 text-[15px] hover:bg-brown-50"
+                >
+                  <span className="text-black">{task.title}</span>
+                  <span className="text-[13px] text-black">
+                    {completedCount} / {task.subTasks.length} タスク完了
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
           {section.tasks.length === 0 && (
             <p className="text-xs text-gray-400">課題がまだありません。</p>
           )}

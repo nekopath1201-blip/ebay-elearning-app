@@ -3,13 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 
-const STATUS_BADGE: Record<string, string> = {
-  NOT_STARTED: "⬜ 未着手",
-  IN_PROGRESS: "🟡 進行中",
-  COMPLETED: "✅ 完了",
+type TaskItem = {
+  id: string;
+  title: string;
+  completedCount: number;
+  totalCount: number;
 };
-
-type TaskItem = { id: string; title: string; status: string };
 
 export function SectionAccordion({
   section,
@@ -20,11 +19,12 @@ export function SectionAccordion({
     description: string | null;
     tasks: TaskItem[];
     completedCount: number;
+    totalCount: number;
   };
 }) {
   const [open, setOpen] = useState(false);
   const isSectionComplete =
-    section.tasks.length > 0 && section.completedCount === section.tasks.length;
+    section.totalCount > 0 && section.completedCount === section.totalCount;
 
   return (
     <div className="rounded-xl bg-white shadow-sm">
@@ -45,7 +45,7 @@ export function SectionAccordion({
                 完了
               </span>
             )}
-            {section.completedCount} / {section.tasks.length} 課題完了
+            {section.completedCount} / {section.totalCount} タスク完了
           </p>
         </div>
         <span
@@ -72,7 +72,7 @@ export function SectionAccordion({
                   >
                     <span className="text-black">{task.title}</span>
                     <span className="text-[13px] text-black">
-                      {STATUS_BADGE[task.status]}
+                      {task.completedCount} / {task.totalCount} タスク完了
                     </span>
                   </Link>
                 </li>

@@ -1,8 +1,11 @@
 import { prisma } from "@/lib/prisma";
 
 export async function getTotalPublishedTaskCount() {
-  return prisma.task.count({
-    where: { published: true, section: { published: true } },
+  return prisma.subTask.count({
+    where: {
+      published: true,
+      task: { published: true, section: { published: true } },
+    },
   });
 }
 
@@ -11,7 +14,10 @@ export async function getUserCompletedTaskCount(userId: string) {
     where: {
       userId,
       status: "COMPLETED",
-      task: { published: true, section: { published: true } },
+      subTask: {
+        published: true,
+        task: { published: true, section: { published: true } },
+      },
     },
   });
 }
