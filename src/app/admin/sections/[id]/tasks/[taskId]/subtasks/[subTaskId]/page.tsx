@@ -27,12 +27,19 @@ export default async function AdminSubTaskDetailPage({
 
   return (
     <div className="flex flex-col gap-8">
-      <div>
+      <div className="flex items-center justify-between">
         <Link
           href={`/admin/sections/${id}/tasks/${taskId}`}
           className="text-sm text-gray-500 hover:text-gray-700 hover:underline"
         >
           ← 課題に戻る
+        </Link>
+        <Link
+          href={`/admin/sections/${id}/tasks/${taskId}/subtasks/${subTaskId}/preview`}
+          target="_blank"
+          className="rounded-md border border-brown-600 px-3 py-1 text-sm text-brown-600 hover:bg-brown-50"
+        >
+          受講画面プレビュー →
         </Link>
       </div>
 
